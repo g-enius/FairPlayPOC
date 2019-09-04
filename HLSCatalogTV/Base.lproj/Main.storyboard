@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder.AppleTV.Storyboard" version="3.0" toolsVersion="11198.2" systemVersion="16A270e" targetRuntime="AppleTV" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="uo3-3R-mSZ">
+    <dependencies>
+        <deployment identifier="tvOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11161"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Streams-->
+        <scene sceneID="WOU-Qu-4Jn">
+            <objects>
+                <tableViewController id="4L2-bY-RdY" customClass="AssetListTableViewController" customModule="HLSCatalogTV" customModuleProvider="target" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="66" sectionHeaderHeight="66" sectionFooterHeight="66" id="znf-cD-VMl">
+                        <rect key="frame" x="0.0" y="0.0" width="1920" height="1080"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <prototypes>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" misplaced="YES" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="AssetListTableViewCellIdentifier" id="EHJ-UN-Cig" customClass="AssetListTableViewCell" customModule="HLSCatalogTV" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="211" width="1920" height="66"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="EHJ-UN-Cig" id="ARf-Rf-JLL">
+                                    <frame key="frameInset" width="1920" height="66"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="equalSpacing" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="fgS-6v-XbK">
+                                            <subviews>
+                                                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="rEC-i5-qg3">
+                                                    <fontDescription key="fontDescription" style="UICTFontTextStyleTitle3"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                        </stackView>
+                                    </subviews>
+                                    <constraints>
+                                        <constraint firstAttribute="trailing" secondItem="fgS-6v-XbK" secondAttribute="trailing" constant="20" symbolic="YES" id="Ghm-Ot-bL8"/>
+                                        <constraint firstItem="fgS-6v-XbK" firstAttribute="leading" secondItem="ARf-Rf-JLL" secondAttribute="leading" constant="20" symbolic="YES" id="IYd-Gr-JR2"/>
+                                        <constraint firstItem="fgS-6v-XbK" firstAttribute="top" secondItem="ARf-Rf-JLL" secondAttribute="top" id="hus-aF-1Aj"/>
+                                        <constraint firstAttribute="bottom" secondItem="fgS-6v-XbK" secondAttribute="bottom" id="ik7-Nd-Qwm"/>
+                                    </constraints>
+                                </tableViewCellContentView>
+                                <connections>
+                                    <outlet property="assetNameLabel" destination="rEC-i5-qg3" id="xsn-T0-v2y"/>
+                                    <segue destination="0Xn-7K-lSw" kind="presentation" identifier="PresentPlayerViewControllerSegueIdentifier" id="eZn-rl-ypj"/>
+                                </connections>
+                            </tableViewCell>
+                        </prototypes>
+                        <connections>
+                            <outlet property="dataSource" destination="4L2-bY-RdY" id="zHQ-Qb-mxp"/>
+                            <outlet property="delegate" destination="4L2-bY-RdY" id="dpl-P2-Iig"/>
+                        </connections>
+                    </tableView>
+                    <navigationItem key="navigationItem" title="Streams" id="uKW-9N-Dqa"/>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="yTm-3d-z8B" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1190" y="37"/>
+        </scene>
+        <!--AV Player View Controller-->
+        <scene sceneID="rMJ-BM-1id">
+            <objects>
+                <avPlayerViewController videoGravity="AVLayerVideoGravityResizeAspect" id="0Xn-7K-lSw" sceneMemberID="viewController"/>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="OOX-GJ-IQ3" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="3237" y="37"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="t3o-5w-aD1">
+            <objects>
+                <navigationController id="uo3-3R-mSZ" sceneMemberID="viewController">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="hIC-uv-MgW">
+                        <rect key="frame" x="0.0" y="0.0" width="1920" height="145"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <connections>
+                        <segue destination="4L2-bY-RdY" kind="relationship" relationship="rootViewController" id="RMb-tr-Z8E"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="S19-IA-okn" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-950" y="37"/>
+        </scene>
+    </scenes>
+</document>
