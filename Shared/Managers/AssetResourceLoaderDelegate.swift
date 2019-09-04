@@ -100,7 +100,8 @@ class AssetResourceLoaderDelegate: NSObject {
         
         // MARK: ADAPT - You must implement this method to request a CKC from your KSM.
         let session = URLSession(configuration: .default)
-        var postRequest = URLRequest(url: URL(string: "https://fairplay.entitlement.theplatform.com/fpls/web/FairPlay?form=json&schema=1.0&token=nOqNo_Tislp8yFZupota8ZAuoADaoKC4&account=http://access.auth.theplatform.com/data/Account/2682481919")!)
+            
+        var postRequest = URLRequest(url: URL(string: "https://fairplay.entitlement.theplatform.com/fpls/web/FairPlay?form=json&schema=1.0&token=EK4p9zhkuQMEC0aWJisUkVB-wCAukLAa&account=http://access.auth.theplatform.com/data/Account/2682481919")!)
         postRequest.httpMethod = "POST"
         postRequest.addValue("application/json; charset=UTF-8", forHTTPHeaderField: "Content-Type")
         postRequest.httpBody = String(format: "{\"getFairplayLicense\": {\"spcMessage\": \"%@\",\"releasePid\": \"pFuwybxW35Ak\"}}", spcData.base64EncodedString() as CVarArg).data(using: .utf8)
@@ -110,7 +111,7 @@ class AssetResourceLoaderDelegate: NSObject {
             do {
                 let json = try JSONDecoder().decode([String: Dictionary<String, String>].self, from: data!)
                 let ckc = json["getFairplayLicenseResponse"]!["ckcResponse"]!
-                let ckcData = ckc.data(using: .utf8)
+                let ckcData = Data(base64Encoded: ckc)
                 completionHandler(ckcData)
 
             } catch {
@@ -149,8 +150,8 @@ class AssetResourceLoaderDelegate: NSObject {
     
     func prepareAndSendContentKeyRequest(resourceLoadingRequest: AVAssetResourceLoadingRequest) {
         
+        let assetIDString = "pFuwybxW35Ak"
         guard let contentKeyIdentifierURL = resourceLoadingRequest.request.url,
-            let assetIDString = contentKeyIdentifierURL.host,
             let assetIDData = assetIDString.data(using: .utf8) else {
                 print("Failed to get url or assetIDString for the request object of the resource.")
                 return
