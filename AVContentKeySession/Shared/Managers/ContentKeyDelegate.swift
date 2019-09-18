@@ -11,6 +11,8 @@ import AVFoundation
 
 class ContentKeyDelegate: NSObject, AVContentKeySessionDelegate {
     
+    let releasePid: String? = "pFuwybxW35Ak"
+
     // MARK: Types
     
     enum ProgramError: Error {
@@ -76,7 +78,7 @@ class ContentKeyDelegate: NSObject, AVContentKeySessionDelegate {
             var postRequest = URLRequest(url: URL(string: "https://fairplay.entitlement.theplatform.com/fpls/web/FairPlay?form=json&schema=1.0&token=UfNNZabI-SjGFwSiPTb2sVDIAFAmYBBu&account=http://access.auth.theplatform.com/data/Account/2682481919")!)
             postRequest.httpMethod = "POST"
             postRequest.addValue("application/json; charset=UTF-8", forHTTPHeaderField: "Content-Type")
-            postRequest.httpBody = String(format: "{\"getFairplayLicense\": {\"spcMessage\": \"%@\",\"releasePid\": \"pFuwybxW35Ak\"}}", spcData.base64EncodedString() as CVarArg).data(using: .utf8)
+            postRequest.httpBody = String(format: "{\"getFairplayLicense\": {\"spcMessage\": \"%@\",\"releasePid\": \"%@\"}}", spcData.base64EncodedString(), releasePid! as CVarArg).data(using: .utf8)
             
             
             dataTask = session.dataTask(with: postRequest) { (data, response, error) in
@@ -207,7 +209,6 @@ class ContentKeyDelegate: NSObject, AVContentKeySessionDelegate {
     // MARK: API
     
     func handleStreamingContentKeyRequest(keyRequest: AVContentKeyRequest) {
-        let releasePid: String? = "pFuwybxW35Ak"
         guard let contentKeyIdentifierString = keyRequest.identifier as? String,
             let contentKeyIdentifierURL = URL(string: contentKeyIdentifierString),
             let assetIDString = releasePid,//contentKeyIdentifierURL.host,

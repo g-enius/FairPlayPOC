@@ -33,9 +33,9 @@ class ContentKeyManager {
     // MARK: Initialization.
     
     private init() {
-        contentKeySession = AVContentKeySession(keySystem: .fairPlayStreaming)
         contentKeyDelegate = ContentKeyDelegate()
-        
+        contentKeySession = AVContentKeySession(keySystem: .fairPlayStreaming, storageDirectoryAt: contentKeyDelegate.contentKeyDirectory)
+
         contentKeySession.setDelegate(contentKeyDelegate, queue: contentKeyDelegateQueue)
     }
 }
