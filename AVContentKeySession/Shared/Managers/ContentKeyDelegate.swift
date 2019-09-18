@@ -51,11 +51,16 @@ class ContentKeyDelegate: NSObject, AVContentKeySessionDelegate {
     var contentKeyToStreamNameMap = [String: String]()
     
     var dataTask: URLSessionDataTask!
-    func requestApplicationCertificate(completionHandler: @escaping (Data?) -> Void) {
+    func requestApplicationCertificate(completionHandler: @escaping (Data?) -> Void) -> Void {
         
         // MARK: ADAPT - You must implement this method to retrieve your FPS application certificate.
-        let session = URLSession(configuration: .default)
-        dataTask = session.dataTask(with: URL(string: "https://d1ee736ymvp3ne.cloudfront.net/fairplay.der")!) { (data, response, error) in
+        let session = URLSession.shared
+        dataTask = session.dataTask(with: URL(string: "https://d1ee736ymvp3ne.cloudfront.net/fairplay.der")!)
+        { (data, response, error) in
+            guard error == nil else {
+                return completionHandler(nil)
+            }
+            
             completionHandler(data)
         }
         
@@ -202,9 +207,10 @@ class ContentKeyDelegate: NSObject, AVContentKeySessionDelegate {
     // MARK: API
     
     func handleStreamingContentKeyRequest(keyRequest: AVContentKeyRequest) {
+        let releasePid: String? = "pFuwybxW35Ak"
         guard let contentKeyIdentifierString = keyRequest.identifier as? String,
             let contentKeyIdentifierURL = URL(string: contentKeyIdentifierString),
-            let assetIDString = contentKeyIdentifierURL.host,
+            let assetIDString = releasePid,//contentKeyIdentifierURL.host,
             let assetIDData = assetIDString.data(using: .utf8)
             else {
                 print("Failed to retrieve the assetID from the keyRequest!")
@@ -212,63 +218,46 @@ class ContentKeyDelegate: NSObject, AVContentKeySessionDelegate {
         }
 
         let provideOnlinekey: () -> Void = { () -> Void in
+            self.requestApplicationCertificate(completionHandler: { applicationCertificate in
 
-            do {
-                self.requestApplicationCertificate(completionHandler: { applicationCertificate in
-                    do {
-                        let completionHandler1 = { [weak self] (spcData: Data?, error: Error?) in
-                            guard let strongSelf = self else { return }
-                            if let error = error {
-                                keyRequest.processContentKeyResponseError(error)
-                                return
-                            }
+                let completionHandler = { [weak self] (spcData: Data?, error: Error?) in
+                    guard let strongSelf = self else { return }
+                    if let error = error {
+                        keyRequest.processContentKeyResponseError(error)
+                        return
+                    }
 
-                            guard let spcData = spcData else { return }
+                    guard let spcData = spcData else { return }
 
-                            do {
-                                // Send SPC to Key Server and obtain CKC
-                                let ckcData = try strongSelf.requestContentKeyFromKeySecurityModule(spcData: spcData, assetID: assetIDString, completionHandler: { ckcData in
-                                    do {
-                                        /*
-                                                                                                           AVContentKeyResponse is used to represent the data returned from the key server when requesting a key for
-                                                                                                           decrypting content.
-                                                                                                           */
-                                                                                                          let keyResponse = AVContentKeyResponse(fairPlayStreamingKeyResponseData: ckcData!)
+                    do{
+                        // Send SPC to Key Server and obtain CKC
+                        try strongSelf.requestContentKeyFromKeySecurityModule(spcData: spcData, assetID: assetIDString, completionHandler: { ckcData in
+                            /*
+                            AVContentKeyResponse is used to represent the data returned from the key server when requesting a key for
+                            decrypting content.
+                            */
+                           let keyResponse = AVContentKeyResponse(fairPlayStreamingKeyResponseData: ckcData!)
 
-                                                                                                          /*
-                                                                                                           Provide the content key response to make protected content available for processing.
-                                                                                                           */
-                                                                                                          keyRequest.processContentKeyResponse(keyResponse)
-                                        keyRequest.makeStreamingContentKeyRequestData(forApp: applicationCertificate,
-                                        contentIdentifier: assetIDData,
-                                        options: [AVContentKeyRequestProtocolVersionsKey: [1]],
-                                        completionHandler: completionHandler1)
-                                        
-                                    }catch {
-                                        keyRequest.processContentKeyResponseError(error)
+                           /*
+                            Provide the content key response to make protected content available for processing.
+                            */
+                           keyRequest.processContentKeyResponse(keyResponse)
 
-                                    }
-                                   
-                                }
-
-                               
-                            } catch {
-                                keyRequest.processContentKeyResponseError(error)
-                            }
-                        
-
-                        
-                    
+                            
+                        })
                     } catch {
                         keyRequest.processContentKeyResponseError(error)
                     }
                 }
-            } catch {
-                keyRequest.processContentKeyResponseError(error)
-            }
+
+                keyRequest.makeStreamingContentKeyRequestData(forApp: applicationCertificate!,
+                                                              contentIdentifier: assetIDData,
+                                                              options: [AVContentKeyRequestProtocolVersionsKey: [1]],
+                                                              completionHandler: completionHandler)
+            })
         }
 
-        #if os(iOS)
+//        #if os(iOS)
             /*
              When you receive an AVContentKeyRequest via -contentKeySession:didProvideContentKeyRequest:
              and you want the resulting key response to produce a key that can persist across multiple
@@ -280,21 +269,21 @@ class ContentKeyDelegate: NSObject, AVContentKeySessionDelegate {
 //            if shouldRequestPersistableContentKey(withIdentifier: assetIDString) ||
 //                persistableContentKeyExistsOnDisk(withContentKeyIdentifier: assetIDString) {
 //
-//                // Request a Persistable Key Request.
+//                 Request a Persistable Key Request.
 //                do {
 //                    try keyRequest.respondByRequestingPersistableContentKeyRequestAndReturnError()
 //                } catch {
-//
-//                    /*
-//                    This case will occur when the client gets a key loading request from an AirPlay Session.
-//                    You should answer the key request using an online key from your key server.
-//                    */
+
+                    /*
+                    This case will occur when the client gets a key loading request from an AirPlay Session.
+                    You should answer the key request using an online key from your key server.
+                    */
 //                    provideOnlinekey()
 //                }
-//
+
 //                return
 //            }
-        #endif
+//        #endif
         
         provideOnlinekey()
     }

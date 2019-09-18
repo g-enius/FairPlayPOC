@@ -21,12 +21,12 @@
 	<dict>
 		<key>content_key_id_list</key>
 		<array>
-			<string>skd://asset-id</string>
+			<string>skd://fairplay.entitlement.theplatform.com/fpls/web/FairPlay</string>
 		</array>
 		<key>name</key>
 		<string>Add Entry for FPS Sample in Streams.plist</string>
 		<key>playlist_url</key>
-		<string>https://apple.com</string>
+		<string>https://814bffb9b389f652.mediapackage.ap-southeast-2.amazonaws.com/out/v1/afc4bc1b1b3c47659cfbeb34ff2fedb5/index.m3u8</string>
 		<key>is_protected</key>
 		<true/>
 	</dict>
