@@ -240,23 +240,23 @@ class ContentKeyDelegate: NSObject, AVContentKeySessionDelegate {
              instead. If the underlying protocol supports persistable content keys, in response your
              delegate will receive an AVPersistableContentKeyRequest via -contentKeySession:didProvidePersistableContentKeyRequest:.
              */
-            if shouldRequestPersistableContentKey(withIdentifier: assetIDString) ||
-                persistableContentKeyExistsOnDisk(withContentKeyIdentifier: assetIDString) {
-                
-                // Request a Persistable Key Request.
-                do {
-                    try keyRequest.respondByRequestingPersistableContentKeyRequestAndReturnError()
-                } catch {
-
-                    /*
-                    This case will occur when the client gets a key loading request from an AirPlay Session.
-                    You should answer the key request using an online key from your key server.
-                    */
-                    provideOnlinekey()
-                }
-                
-                return
-            }
+//            if shouldRequestPersistableContentKey(withIdentifier: assetIDString) ||
+//                persistableContentKeyExistsOnDisk(withContentKeyIdentifier: assetIDString) {
+//                
+//                // Request a Persistable Key Request.
+//                do {
+//                    try keyRequest.respondByRequestingPersistableContentKeyRequestAndReturnError()
+//                } catch {
+//
+//                    /*
+//                    This case will occur when the client gets a key loading request from an AirPlay Session.
+//                    You should answer the key request using an online key from your key server.
+//                    */
+//                    provideOnlinekey()
+//                }
+//                
+//                return
+//            }
         #endif
         
         provideOnlinekey()

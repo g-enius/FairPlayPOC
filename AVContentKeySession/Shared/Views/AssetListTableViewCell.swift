@@ -4,8 +4,8 @@
  
  Abstract:
  `AssetListTableViewCell` is the `UITableViewCell` subclass that represents an `Asset` visually in
- `AssetListTableViewController`.  This cell handles responding to user events as well as updating itself to reflect the
- state of the `Asset` if it has been downloaded, deleted, or is actively downloading.
+ `AssetListTableViewController`.  This cell handles responding to user events as well as updating
+ itself to reflect the state of the `Asset` if it has been downloaded, deleted, or is actively downloading.
  */
 
 import UIKit
@@ -29,30 +29,30 @@ class AssetListTableViewCell: UITableViewCell {
     var asset: Asset? {
         didSet {
             if let asset = asset {
-                #if os(iOS)
-                    let downloadState = AssetPersistenceManager.sharedManager.downloadState(for: asset)
-                    
-                    switch downloadState {
-                    case .downloaded:
-                        downloadProgressView.isHidden = true
-                        
-                    case .downloading:
-                        
-                        downloadProgressView.isHidden = false
-                        
-                    case .notDownloaded:
-                        break
-                    }
-                    
-                    downloadStateLabel.text = downloadState.rawValue
-                    
-                    let notificationCenter = NotificationCenter.default
-                    notificationCenter.addObserver(self,
-                                                   selector: #selector(handleAssetDownloadStateChanged(_:)),
-                                                   name: .AssetDownloadStateChanged, object: nil)
-                    notificationCenter.addObserver(self, selector: #selector(handleAssetDownloadProgress(_:)),
-                                                   name: .AssetDownloadProgress, object: nil)
-                #endif
+//                #if os(iOS)
+//                    let downloadState = AssetPersistenceManager.sharedManager.downloadState(for: asset)
+//
+//                    switch downloadState {
+//                    case .downloaded:
+//                        downloadProgressView.isHidden = true
+//
+//                    case .downloading:
+//
+//                        downloadProgressView.isHidden = false
+//
+//                    case .notDownloaded:
+//                        break
+//                    }
+//
+//                    downloadStateLabel.text = downloadState.rawValue
+//
+//                    let notificationCenter = NotificationCenter.default
+//                    notificationCenter.addObserver(self,
+//                                                   selector: #selector(handleAssetDownloadStateChanged(_:)),
+//                                                   name: .AssetDownloadStateChanged, object: nil)
+//                    notificationCenter.addObserver(self, selector: #selector(handleAssetDownloadProgress(_:)),
+//                                                   name: .AssetDownloadProgress, object: nil)
+//                #endif
                 
                 assetNameLabel.text = asset.stream.name
             } else {
@@ -99,7 +99,7 @@ class AssetListTableViewCell: UITableViewCell {
         guard let assetStreamName = notification.userInfo![Asset.Keys.name] as? String, let asset = asset,
             asset.stream.name == assetStreamName else { return }
         guard let progress = notification.userInfo![Asset.Keys.percentDownloaded] as? Double else { return }
-        
+
         self.downloadProgressView.setProgress(Float(progress), animated: true)
     }
     #endif
