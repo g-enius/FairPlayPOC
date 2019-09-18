@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+	<dict>
+		<key>name</key>
+		<string>Basic Stream</string>
+		<key>playlist_url</key>
+		<string>https://devstreaming-cdn.apple.com/videos/streaming/examples/bipbop_4x3/bipbop_4x3_variant.m3u8</string>
+		<key>is_protected</key>
+		<false/>
+	</dict>
+	<dict>
+		<key>name</key>
+		<string>Advanced Stream</string>
+		<key>playlist_url</key>
+		<string>https://devstreaming-cdn.apple.com/videos/streaming/examples/img_bipbop_adv_example_ts/master.m3u8</string>
+		<key>is_protected</key>
+		<false/>
+	</dict>
+	<dict>
+		<key>content_key_id_list</key>
+		<array>
+			<string>skd://asset-id</string>
+		</array>
+		<key>name</key>
+		<string>Add Entry for FPS Sample in Streams.plist</string>
+		<key>playlist_url</key>
+		<string>https://apple.com</string>
+		<key>is_protected</key>
+		<true/>
+	</dict>
+</array>
+</plist>
