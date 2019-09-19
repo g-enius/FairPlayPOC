@@ -89,59 +89,60 @@ class AssetListTableViewController: UITableViewController {
         return cell
     }
     
-//#if os(iOS)
-//    override func tableView(_ tableView: UITableView, accessoryButtonTappedForRowWith indexPath: IndexPath) {
-//        guard let cell = tableView.cellForRow(at: indexPath) as? AssetListTableViewCell,
-//            let asset = cell.asset else { return }
-//
+#if os(iOS)
+    override func tableView(_ tableView: UITableView, accessoryButtonTappedForRowWith indexPath: IndexPath) {
+        guard let cell = tableView.cellForRow(at: indexPath) as? AssetListTableViewCell,
+            let asset = cell.asset else { return }
+
 //        let downloadState = AssetPersistenceManager.sharedManager.downloadState(for: asset)
-//        let alertAction: UIAlertAction
-//
+        let alertAction: UIAlertAction
+
 //        switch downloadState {
 //        case .notDownloaded:
-//            alertAction = UIAlertAction(title: "Download", style: .default) { _ in
-//                if asset.stream.isProtected {
+            alertAction = UIAlertAction(title: "Download", style: .default) { _ in
+                if asset.stream.isProtected {
 //                    self.pendingContentKeyRequests[asset.stream.name] = asset
-//
-//                   //Only Diff:
-//ContentKeyManager.shared.contentKeyDelegate.requestPersistableContentKeys(forAsset: asset)
+
+                   // Diff:
+ContentKeyManager.shared.contentKeyDelegate.requestPersistableContentKeys(forAsset: asset)
 //                } else {
 //                    AssetPersistenceManager.sharedManager.downloadStream(for: asset)
 //                }
-//            }
-//
+            }
+
 //        case .downloading:
 //            alertAction = UIAlertAction(title: "Cancel", style: .default) { _ in
 //                AssetPersistenceManager.sharedManager.cancelDownload(for: asset)
 //            }
-//
+
 //        case .downloaded:
 //            alertAction = UIAlertAction(title: "Delete", style: .default) { _ in
 //                AssetPersistenceManager.sharedManager.deleteAsset(asset)
-//
-//                if asset.stream.isProtected {
-//                    ContentKeyManager.shared.assetResourceLoaderDelegate.deleteAllPeristableContentKeys(forAsset: asset)
-//                }
+        
+        // Diff:
+                if asset.stream.isProtected {
+                    ContentKeyManager.shared.contentKeyDelegate.deleteAllPeristableContentKeys(forAsset: asset)
+                }
 //            }
-//        }
-//
-//        let alertController = UIAlertController(title: asset.stream.name, message: "Select from the following options:",
-//                                                preferredStyle: .actionSheet)
-//        alertController.addAction(alertAction)
-//        alertController.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: nil))
-//
-//        if UIDevice.current.userInterfaceIdiom == .pad {
-//            guard let popoverController = alertController.popoverPresentationController else {
-//                return
-//            }
-//
-//            popoverController.sourceView = cell
-//            popoverController.sourceRect = cell.bounds
-//        }
-//
-//        present(alertController, animated: true, completion: nil)
-//    }
-//#endif
+        }
+
+        let alertController = UIAlertController(title: asset.stream.name, message: "Select from the following options:",
+                                                preferredStyle: .actionSheet)
+        alertController.addAction(alertAction)
+        alertController.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: nil))
+
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            guard let popoverController = alertController.popoverPresentationController else {
+                return
+            }
+
+            popoverController.sourceView = cell
+            popoverController.sourceRect = cell.bounds
+        }
+
+        present(alertController, animated: true, completion: nil)
+    }
+#endif
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         super.prepare(for: segue, sender: sender)
