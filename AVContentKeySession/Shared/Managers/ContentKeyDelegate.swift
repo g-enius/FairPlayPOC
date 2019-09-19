@@ -11,7 +11,7 @@ import AVFoundation
 
 class ContentKeyDelegate: NSObject, AVContentKeySessionDelegate {
     
-    let releasePid: String? = "pFuwybxW35Ak"
+    let releasePid: String = "pFuwybxW35Ak"
 
     // MARK: Types
     
@@ -75,10 +75,10 @@ class ContentKeyDelegate: NSObject, AVContentKeySessionDelegate {
             // MARK: ADAPT - You must implement this method to request a CKC from your KSM.
             let session = URLSession(configuration: .default)
                 
-            var postRequest = URLRequest(url: URL(string: "https://fairplay.entitlement.theplatform.com/fpls/web/FairPlay?form=json&schema=1.0&token=UfNNZabI-SjGFwSiPTb2sVDIAFAmYBBu&account=http://access.auth.theplatform.com/data/Account/2682481919")!)
+            var postRequest = URLRequest(url: URL(string: "https://fairplay.entitlement.theplatform.com/fpls/web/FairPlay?form=json&schema=1.0&token=wdXzY3JAITxuB-SCLdaO8XAMYMC48CCi&account=http://access.auth.theplatform.com/data/Account/2682481919")!)
             postRequest.httpMethod = "POST"
             postRequest.addValue("application/json; charset=UTF-8", forHTTPHeaderField: "Content-Type")
-            postRequest.httpBody = String(format: "{\"getFairplayLicense\": {\"spcMessage\": \"%@\",\"releasePid\": \"%@\"}}", spcData.base64EncodedString(), releasePid! as CVarArg).data(using: .utf8)
+            postRequest.httpBody = String(format: "{\"getFairplayLicense\": {\"spcMessage\": \"%@\",\"releasePid\": \"%@\"}}", spcData.base64EncodedString(), releasePid as CVarArg).data(using: .utf8)
             
             
             dataTask = session.dataTask(with: postRequest) { (data, response, error) in
@@ -89,9 +89,7 @@ class ContentKeyDelegate: NSObject, AVContentKeySessionDelegate {
                     completionHandler(ckcData)
 
                 } catch {
-                    
                 }
-                
             }
             
             dataTask.resume()
@@ -209,14 +207,17 @@ class ContentKeyDelegate: NSObject, AVContentKeySessionDelegate {
     // MARK: API
     
     func handleStreamingContentKeyRequest(keyRequest: AVContentKeyRequest) {
-        guard let contentKeyIdentifierString = keyRequest.identifier as? String,
-            let contentKeyIdentifierURL = URL(string: contentKeyIdentifierString),
-            let assetIDString = releasePid,//contentKeyIdentifierURL.host,
-            let assetIDData = assetIDString.data(using: .utf8)
-            else {
-                print("Failed to retrieve the assetID from the keyRequest!")
-                return
-        }
+        let assetIDData = releasePid.data(using: .utf8)
+
+//        guard let contentKeyIdentifierString = keyRequest.identifier as? String,
+//            let contentKeyIdentifierURL = URL(string: contentKeyIdentifierString),
+//            let assetIDString = contentKeyIdentifierURL.host,
+//            let assetIDData = assetIDString.data(using: .utf8)
+//            else {
+//                print("Failed to retrieve the assetID from the keyRequest!")
+//                return
+//        }
+//        print("+++", keyRequest.identifier!)
 
         let provideOnlinekey: () -> Void = { () -> Void in
             self.requestApplicationCertificate(completionHandler: { applicationCertificate in
@@ -232,7 +233,7 @@ class ContentKeyDelegate: NSObject, AVContentKeySessionDelegate {
 
                     do{
                         // Send SPC to Key Server and obtain CKC
-                        try strongSelf.requestContentKeyFromKeySecurityModule(spcData: spcData, assetID: assetIDString, completionHandler: { ckcData in
+                        try strongSelf.requestContentKeyFromKeySecurityModule(spcData: spcData, assetID: strongSelf.releasePid, completionHandler: { ckcData in
                             /*
                             AVContentKeyResponse is used to represent the data returned from the key server when requesting a key for
                             decrypting content.
@@ -252,7 +253,7 @@ class ContentKeyDelegate: NSObject, AVContentKeySessionDelegate {
                 }
 
                 keyRequest.makeStreamingContentKeyRequestData(forApp: applicationCertificate!,
-                                                              contentIdentifier: assetIDData,
+                                                              contentIdentifier: assetIDData!,
                                                               options: [AVContentKeyRequestProtocolVersionsKey: [1]],
                                                               completionHandler: completionHandler)
             })
