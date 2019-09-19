@@ -24,11 +24,11 @@ class AssetListTableViewController: UITableViewController {
     
     // MARK: Deinitialization
     
-    deinit {
-        NotificationCenter.default.removeObserver(self,
-                                                  name: .AssetListManagerDidLoad,
-                                                  object: nil)
-    }
+//    deinit {
+//        NotificationCenter.default.removeObserver(self,
+//                                                  name: .AssetListManagerDidLoad,
+//                                                  object: nil)
+//    }
     
     // MARK: UIViewController
     
@@ -42,9 +42,9 @@ class AssetListTableViewController: UITableViewController {
         // Set AssetListTableViewController as the delegate for AssetPlaybackManager to recieve playback information.
         AssetPlaybackManager.sharedManager.delegate = self
         
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(handleAssetListManagerDidLoad(_:)),
-                                               name: .AssetListManagerDidLoad, object: nil)
+//        NotificationCenter.default.addObserver(self,
+//                                               selector: #selector(handleAssetListManagerDidLoad(_:)),
+//                                               name: .AssetListManagerDidLoad, object: nil)
         
 //        #if os(iOS)
 //            NotificationCenter.default.addObserver(self,
@@ -83,7 +83,7 @@ class AssetListTableViewController: UITableViewController {
         
         if let cell = cell as? AssetListTableViewCell {
             cell.asset = asset
-            cell.delegate = self
+//            cell.delegate = self
         }
         
         return cell
@@ -104,7 +104,7 @@ class AssetListTableViewController: UITableViewController {
 //                    self.pendingContentKeyRequests[asset.stream.name] = asset
 
                    // Diff:
-ContentKeyManager.shared.contentKeyDelegate.requestPersistableContentKeys(forAsset: asset)
+                    ContentKeyManager.shared.contentKeyDelegate.requestPersistableContentKeys(forAsset: asset)
 //                } else {
 //                    AssetPersistenceManager.sharedManager.downloadStream(for: asset)
 //                }
@@ -158,13 +158,13 @@ ContentKeyManager.shared.contentKeyDelegate.requestPersistableContentKeys(forAss
             */
             playerViewController = playerViewControler
             
-//            #if os(iOS)
+            #if os(iOS)
 //                if AssetPersistenceManager.sharedManager.downloadState(for: asset) == .downloaded {
 //                    if !asset.urlAsset.resourceLoader.preloadsEligibleContentKeys {
 //                        asset.urlAsset.resourceLoader.preloadsEligibleContentKeys = true
 //                    }
 //                }
-//            #endif
+            #endif
             
             // Load the new Asset to playback into AssetPlaybackManager.
             AssetPlaybackManager.sharedManager.setAssetForPlayback(asset)
@@ -173,12 +173,12 @@ ContentKeyManager.shared.contentKeyDelegate.requestPersistableContentKeys(forAss
     
     // MARK: Notification handling
     
-    @objc
-    func handleAssetListManagerDidLoad(_: Notification) {
-        DispatchQueue.main.async {
-            self.tableView.reloadData()
-        }
-    }
+//    @objc
+//    func handleAssetListManagerDidLoad(_: Notification) {
+//        DispatchQueue.main.async {
+//            self.tableView.reloadData()
+//        }
+//    }
     
 //#if os(iOS)
 //    @objc
@@ -196,14 +196,14 @@ ContentKeyManager.shared.contentKeyDelegate.requestPersistableContentKeys(forAss
 /**
  Extend `AssetListTableViewController` to conform to the `AssetListTableViewCellDelegate` protocol.
  */
-extension AssetListTableViewController: AssetListTableViewCellDelegate {
-    
-    func assetListTableViewCell(_ cell: AssetListTableViewCell, downloadStateDidChange newState: Asset.DownloadState) {
-        guard let indexPath = tableView.indexPath(for: cell) else { return }
-        
-        tableView.reloadRows(at: [indexPath], with: .automatic)
-    }
-}
+//extension AssetListTableViewController: AssetListTableViewCellDelegate {
+//
+//    func assetListTableViewCell(_ cell: AssetListTableViewCell, downloadStateDidChange newState: Asset.DownloadState) {
+//        guard let indexPath = tableView.indexPath(for: cell) else { return }
+//
+//        tableView.reloadRows(at: [indexPath], with: .automatic)
+//    }
+//}
 
 /**
  Extend `AssetListTableViewController` to conform to the `AssetPlaybackDelegate` protocol.

@@ -49,8 +49,8 @@ class AssetListManager: NSObject {
                 self.assets.append(asset)
             }
 
-            NotificationCenter.default.post(name: .AssetListManagerDidLoad,
-                                            object: self)
+//            NotificationCenter.default.post(name: .AssetListManagerDidLoad,
+//                                            object: self)
 //        #endif
     }
     
@@ -110,8 +110,8 @@ class AssetListManager: NSObject {
 //#endif
 }
 
-extension Notification.Name {
-    
-    /// Notification for when download progress has changed.
-    static let AssetListManagerDidLoad = Notification.Name(rawValue: "AssetListManagerDidLoadNotification")
-}
+//extension Notification.Name {
+//
+//    /// Notification for when download progress has changed.
+//    static let AssetListManagerDidLoad = Notification.Name(rawValue: "AssetListManagerDidLoadNotification")
+//}
