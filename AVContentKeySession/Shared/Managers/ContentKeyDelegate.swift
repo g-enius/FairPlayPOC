@@ -11,7 +11,7 @@ import AVFoundation
 
 class ContentKeyDelegate: NSObject, AVContentKeySessionDelegate {
     
-    let releasePid: String = "pFuwybxW35Ak"
+    let releasePid: String = "mCFyF4sxoYjx"
 
     // MARK: Types
     
@@ -75,7 +75,7 @@ class ContentKeyDelegate: NSObject, AVContentKeySessionDelegate {
             // MARK: ADAPT - You must implement this method to request a CKC from your KSM.
             let session = URLSession(configuration: .default)
                 
-            var postRequest = URLRequest(url: URL(string: "https://fairplay.entitlement.theplatform.com/fpls/web/FairPlay?form=json&schema=1.0&token=wdXzY3JAITxuB-SCLdaO8XAMYMC48CCi&account=http://access.auth.theplatform.com/data/Account/2682481919")!)
+            var postRequest = URLRequest(url: URL(string: "https://fairplay.entitlement.theplatform.com/fpls/web/FairPlay?form=json&schema=1.0&token=Aj8XvsF6AOi-lOsYptuA4QBYMKBG8FAY&account=http://access.auth.theplatform.com/data/Account/2682481919")!)
             postRequest.httpMethod = "POST"
             postRequest.addValue("application/json; charset=UTF-8", forHTTPHeaderField: "Content-Type")
             postRequest.httpBody = String(format: "{\"getFairplayLicense\": {\"spcMessage\": \"%@\",\"releasePid\": \"%@\"}}", spcData.base64EncodedString(), releasePid as CVarArg).data(using: .utf8)
@@ -207,7 +207,8 @@ class ContentKeyDelegate: NSObject, AVContentKeySessionDelegate {
     // MARK: API
     
     func handleStreamingContentKeyRequest(keyRequest: AVContentKeyRequest) {
-        let assetIDData = releasePid.data(using: .utf8)
+        let assetIDString = releasePid
+        let assetIDData = assetIDString.data(using: .utf8)
 
 //        guard let contentKeyIdentifierString = keyRequest.identifier as? String,
 //            let contentKeyIdentifierURL = URL(string: contentKeyIdentifierString),
@@ -259,7 +260,7 @@ class ContentKeyDelegate: NSObject, AVContentKeySessionDelegate {
             })
         }
 
-//        #if os(iOS)
+        #if os(iOS)
             /*
              When you receive an AVContentKeyRequest via -contentKeySession:didProvideContentKeyRequest:
              and you want the resulting key response to produce a key that can persist across multiple
@@ -268,24 +269,28 @@ class ContentKeyDelegate: NSObject, AVContentKeySessionDelegate {
              instead. If the underlying protocol supports persistable content keys, in response your
              delegate will receive an AVPersistableContentKeyRequest via -contentKeySession:didProvidePersistableContentKeyRequest:.
              */
-//            if shouldRequestPersistableContentKey(withIdentifier: assetIDString) ||
-//                persistableContentKeyExistsOnDisk(withContentKeyIdentifier: assetIDString) {
-//
+            if shouldRequestPersistableContentKey(withIdentifier: assetIDString) ||
+                persistableContentKeyExistsOnDisk(withContentKeyIdentifier: assetIDString) {
+
 //                 Request a Persistable Key Request.
-//                do {
-//                    try keyRequest.respondByRequestingPersistableContentKeyRequestAndReturnError()
-//                } catch {
+                if #available(iOS 11.2, *) {
+                    do {
+                        try keyRequest.respondByRequestingPersistableContentKeyRequestAndReturnError()
+                    } catch {
 
-                    /*
-                    This case will occur when the client gets a key loading request from an AirPlay Session.
-                    You should answer the key request using an online key from your key server.
-                    */
-//                    provideOnlinekey()
-//                }
+                        /*
+                        This case will occur when the client gets a key loading request from an AirPlay Session.
+                        You should answer the key request using an online key from your key server.
+                        */
+                        provideOnlinekey()
+                    }
+                } else {
+                    keyRequest.respondByRequestingPersistableContentKeyRequest()
+                }
 
-//                return
-//            }
-//        #endif
+                return
+            }
+        #endif
         
         provideOnlinekey()
     }
