@@ -75,7 +75,7 @@ class ContentKeyDelegate: NSObject, AVContentKeySessionDelegate {
             // MARK: ADAPT - You must implement this method to request a CKC from your KSM.
             let session = URLSession(configuration: .default)
                 
-            var postRequest = URLRequest(url: URL(string: "https://fairplay.entitlement.theplatform.com/fpls/web/FairPlay?form=json&schema=1.0&token=TtvJM4WGcoWqmAtmhksKgVAAoBCsALC-&account=http://access.auth.theplatform.com/data/Account/2682481919")!)
+            var postRequest = URLRequest(url: URL(string: "https://fairplay.entitlement.theplatform.com/fpls/web/FairPlay?form=json&schema=1.0&token=ANBFIDtKj330-Ru-Nvts0eBy4NCe0CDs&account=http://access.auth.theplatform.com/data/Account/2682481919")!)
             postRequest.httpMethod = "POST"
             postRequest.addValue("application/json; charset=UTF-8", forHTTPHeaderField: "Content-Type")
             postRequest.httpBody = String(format: "{\"getFairplayLicense\": {\"spcMessage\": \"%@\",\"releasePid\": \"%@\"}}", spcData.base64EncodedString(), releasePid as CVarArg).data(using: .utf8)
@@ -269,7 +269,7 @@ class ContentKeyDelegate: NSObject, AVContentKeySessionDelegate {
              instead. If the underlying protocol supports persistable content keys, in response your
              delegate will receive an AVPersistableContentKeyRequest via -contentKeySession:didProvidePersistableContentKeyRequest:.
              */
-            if shouldRequestPersistableContentKey(withIdentifier: assetIDString) ||
+                if shouldRequestPersistableContentKey(withIdentifier: assetIDString) ||
                 persistableContentKeyExistsOnDisk(withContentKeyIdentifier: assetIDString) {
 
 //                 Request a Persistable Key Request.
