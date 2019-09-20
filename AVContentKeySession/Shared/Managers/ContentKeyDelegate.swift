@@ -75,7 +75,7 @@ class ContentKeyDelegate: NSObject, AVContentKeySessionDelegate {
             // MARK: ADAPT - You must implement this method to request a CKC from your KSM.
             let session = URLSession(configuration: .default)
                 
-            var postRequest = URLRequest(url: URL(string: "https://fairplay.entitlement.theplatform.com/fpls/web/FairPlay?form=json&schema=1.0&token=Aj8XvsF6AOi-lOsYptuA4QBYMKBG8FAY&account=http://access.auth.theplatform.com/data/Account/2682481919")!)
+            var postRequest = URLRequest(url: URL(string: "https://fairplay.entitlement.theplatform.com/fpls/web/FairPlay?form=json&schema=1.0&token=TtvJM4WGcoWqmAtmhksKgVAAoBCsALC-&account=http://access.auth.theplatform.com/data/Account/2682481919")!)
             postRequest.httpMethod = "POST"
             postRequest.addValue("application/json; charset=UTF-8", forHTTPHeaderField: "Content-Type")
             postRequest.httpBody = String(format: "{\"getFairplayLicense\": {\"spcMessage\": \"%@\",\"releasePid\": \"%@\"}}", spcData.base64EncodedString(), releasePid as CVarArg).data(using: .utf8)
@@ -166,7 +166,7 @@ class ContentKeyDelegate: NSObject, AVContentKeySessionDelegate {
      -contentKeySession:contentKeyRequest:didFailWithError:.
      */
     func contentKeySession(_ session: AVContentKeySession, shouldRetry keyRequest: AVContentKeyRequest,
-                           reason retryReason: AVContentKeyRequestRetryReason) -> Bool {
+                           reason retryReason: AVContentKeyRequest.RetryReason) -> Bool {
         
         var shouldRetry = false
         
@@ -175,21 +175,21 @@ class ContentKeyDelegate: NSObject, AVContentKeySessionDelegate {
              Indicates that the content key request should be retried because the key response was not set soon enough either
              due the initial request/response was taking too long, or a lease was expiring in the meantime.
              */
-        case AVContentKeyRequestRetryReason.timedOut:
+        case AVContentKeyRequest.RetryReason.timedOut:
             shouldRetry = true
             
             /*
              Indicates that the content key request should be retried because a key response with expired lease was set on the
              previous content key request.
              */
-        case AVContentKeyRequestRetryReason.receivedResponseWithExpiredLease:
+        case AVContentKeyRequest.RetryReason.receivedResponseWithExpiredLease:
             shouldRetry = true
             
             /*
              Indicates that the content key request should be retried because an obsolete key response was set on the previous
              content key request.
              */
-        case AVContentKeyRequestRetryReason.receivedObsoleteContentKey:
+        case AVContentKeyRequest.RetryReason.receivedObsoleteContentKey:
             shouldRetry = true
             
         default:

@@ -37,7 +37,7 @@ class AssetListTableViewController: UITableViewController {
         
         // General setup for auto sizing UITableViewCells.
         tableView.estimatedRowHeight = 75.0
-        tableView.rowHeight = UITableViewAutomaticDimension
+        tableView.rowHeight = UITableView.automaticDimension
         
         // Set AssetListTableViewController as the delegate for AssetPlaybackManager to recieve playback information.
         AssetPlaybackManager.sharedManager.delegate = self
