@@ -11,7 +11,8 @@ import AVFoundation
 
 class ContentKeyDelegate: NSObject, AVContentKeySessionDelegate {
     
-    let releasePid: String = "mCFyF4sxoYjx"
+    let releasePid = "mCFyF4sxoYjx"
+    let mpxToken = "lKIxqB0kKqnMHOYqTRa2cSDWwACyoIBo"
 
     // MARK: Types
     
@@ -57,7 +58,7 @@ class ContentKeyDelegate: NSObject, AVContentKeySessionDelegate {
         
         // MARK: ADAPT - You must implement this method to retrieve your FPS application certificate.
         let session = URLSession.shared
-        dataTask = session.dataTask(with: URL(string: "https://d1ee736ymvp3ne.cloudfront.net/fairplay.der")!)
+        dataTask = session.dataTask(with: URL(string: "https://test-goskygo.skygo.co.nz/fairplay.der")!)
         { (data, response, error) in
             guard error == nil else {
                 return completionHandler(nil)
@@ -75,7 +76,7 @@ class ContentKeyDelegate: NSObject, AVContentKeySessionDelegate {
             // MARK: ADAPT - You must implement this method to request a CKC from your KSM.
             let session = URLSession(configuration: .default)
                 
-            var postRequest = URLRequest(url: URL(string: "https://fairplay.entitlement.theplatform.com/fpls/web/FairPlay?form=json&schema=1.0&token=ANBFIDtKj330-Ru-Nvts0eBy4NCe0CDs&account=http://access.auth.theplatform.com/data/Account/2682481919")!)
+            var postRequest = URLRequest(url: URL(string: "https://fairplay.entitlement.theplatform.com/fpls/web/FairPlay?form=json&schema=1.0&token=\(mpxToken)&account=http://access.auth.theplatform.com/data/Account/2682481919")!)
             postRequest.httpMethod = "POST"
             postRequest.addValue("application/json; charset=UTF-8", forHTTPHeaderField: "Content-Type")
             postRequest.httpBody = String(format: "{\"getFairplayLicense\": {\"spcMessage\": \"%@\",\"releasePid\": \"%@\"}}", spcData.base64EncodedString(), releasePid as CVarArg).data(using: .utf8)
@@ -207,18 +208,19 @@ class ContentKeyDelegate: NSObject, AVContentKeySessionDelegate {
     // MARK: API
     
     func handleStreamingContentKeyRequest(keyRequest: AVContentKeyRequest) {
-        let assetIDString = releasePid
-        let assetIDData = assetIDString.data(using: .utf8)
 
-//        guard let contentKeyIdentifierString = keyRequest.identifier as? String,
-//            let contentKeyIdentifierURL = URL(string: contentKeyIdentifierString),
-//            let assetIDString = contentKeyIdentifierURL.host,
-//            let assetIDData = assetIDString.data(using: .utf8)
-//            else {
-//                print("Failed to retrieve the assetID from the keyRequest!")
-//                return
-//        }
-//        print("+++", keyRequest.identifier!)
+        guard let contentKeyIdentifierString = keyRequest.identifier as? String,
+            let contentKeyIdentifierURL = URL(string: contentKeyIdentifierString),
+            var assetIDString = contentKeyIdentifierURL.host,
+            var assetIDData = assetIDString.data(using: .utf8)
+            else {
+                print("Failed to retrieve the assetID from the keyRequest!")
+                return
+        }
+        
+        assetIDString = releasePid
+        assetIDData = assetIDString.data(using: .utf8)!
+
 
         let provideOnlinekey: () -> Void = { () -> Void in
             self.requestApplicationCertificate(completionHandler: { applicationCertificate in
@@ -254,7 +256,7 @@ class ContentKeyDelegate: NSObject, AVContentKeySessionDelegate {
                 }
 
                 keyRequest.makeStreamingContentKeyRequestData(forApp: applicationCertificate!,
-                                                              contentIdentifier: assetIDData!,
+                                                              contentIdentifier: assetIDData,
                                                               options: [AVContentKeyRequestProtocolVersionsKey: [1]],
                                                               completionHandler: completionHandler)
             })

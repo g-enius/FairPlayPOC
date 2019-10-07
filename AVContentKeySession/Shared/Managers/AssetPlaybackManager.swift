@@ -6,6 +6,8 @@
  `AssetPlaybackManager` is the class that manages the playback of Assets in this sample using Key-value observing on various AVFoundation classes.
  */
 
+//Sequence: create AVURLAsset -> Observe AVURLAsset.isPlayable -> create AVPalyerItem -> player.replaceCurrentItem -> Observe AVPalyerItem.status == .readyToPlay -> player.play()
+
 import UIKit
 import AVFoundation
 
@@ -49,6 +51,7 @@ class AssetPlaybackManager: NSObject {
                 if item.status == .readyToPlay {
                     if !strongSelf.readyForPlayback {
                         strongSelf.readyForPlayback = true
+                        //tell outside, player is ready to play
                         strongSelf.delegate?.streamPlaybackManager(strongSelf, playerReadyToPlay: strongSelf.player)
                     }
                 } else if item.status == .failed {
@@ -73,7 +76,7 @@ class AssetPlaybackManager: NSObject {
             if let asset = asset {
                 urlAssetObserver = asset.urlAsset.observe(\AVURLAsset.isPlayable, options: [.new, .initial]) { [weak self] (urlAsset, _) in
                     guard let strongSelf = self, urlAsset.isPlayable == true else { return }
-                    
+                    //only when AVURLAsset is playable, create the playerItem
                     strongSelf.playerItem = AVPlayerItem(asset: urlAsset)
                     strongSelf.player.replaceCurrentItem(with: strongSelf.playerItem)
                 }
@@ -91,7 +94,7 @@ class AssetPlaybackManager: NSObject {
         super.init()
         playerObserver = player.observe(\AVPlayer.currentItem, options: [.new]) { [weak self] (player, _) in
             guard let strongSelf = self else { return }
-            
+            //tell outside, player changed play item
             strongSelf.delegate?.streamPlaybackManager(strongSelf, playerCurrentItemDidChange: player)
         }
         
