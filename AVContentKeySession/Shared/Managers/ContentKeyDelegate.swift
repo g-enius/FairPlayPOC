@@ -11,8 +11,8 @@ import AVFoundation
 
 class ContentKeyDelegate: NSObject, AVContentKeySessionDelegate {
     
-    let releasePid = "mCFyF4sxoYjx"
-    let mpxToken = "lKIxqB0kKqnMHOYqTRa2cSDWwACyoIBo"
+    let releasePid = "3y874r0_SUCx"
+    let mpxToken = "Y1XdaT8w27E-TT8ErlZAMSA0AIDK8KBC"
 
     // MARK: Types
     
@@ -63,7 +63,7 @@ class ContentKeyDelegate: NSObject, AVContentKeySessionDelegate {
             guard error == nil else {
                 return completionHandler(nil)
             }
-            
+            print("requestApplicationCertificate:", data)
             completionHandler(data)
         }
         
@@ -87,6 +87,8 @@ class ContentKeyDelegate: NSObject, AVContentKeySessionDelegate {
                     let json = try JSONDecoder().decode([String: Dictionary<String, String>].self, from: data!)
                     let ckc = json["getFairplayLicenseResponse"]!["ckcResponse"]!
                     let ckcData = Data(base64Encoded: ckc)
+                    
+                    print("requestContentKeyFromKeySecurityModule:", ckcData)
                     completionHandler(ckcData)
 
                 } catch {
@@ -120,15 +122,15 @@ class ContentKeyDelegate: NSObject, AVContentKeySessionDelegate {
     ///
     /// - Parameter asset: The `Asset` to preload keys for.
     func requestPersistableContentKeys(forAsset asset: Asset) {
-        for identifier in asset.stream.contentKeyIDList ?? [] {
+//        for identifier in asset.stream.contentKeyIDList ?? [] {
             
-            guard let contentKeyIdentifierURL = URL(string: identifier), let assetIDString = contentKeyIdentifierURL.host else { continue }
+//            guard let contentKeyIdentifierURL = URL(string: identifier), let assetIDString = contentKeyIdentifierURL.host else { continue }
             
-            pendingPersistableContentKeyIdentifiers.insert(assetIDString)
-            contentKeyToStreamNameMap[assetIDString] = asset.stream.name
+            pendingPersistableContentKeyIdentifiers.insert(releasePid)
+            contentKeyToStreamNameMap[releasePid] = asset.stream.name
             
-            ContentKeyManager.shared.contentKeySession.processContentKeyRequest(withIdentifier: identifier, initializationData: nil, options: nil)
-        }
+            ContentKeyManager.shared.contentKeySession.processContentKeyRequest(withIdentifier: releasePid, initializationData: nil, options: nil)
+//        }
     }
     
     /// Returns whether or not a content key should be persistable on disk.
@@ -209,17 +211,17 @@ class ContentKeyDelegate: NSObject, AVContentKeySessionDelegate {
     
     func handleStreamingContentKeyRequest(keyRequest: AVContentKeyRequest) {
 
-        guard let contentKeyIdentifierString = keyRequest.identifier as? String,
-            let contentKeyIdentifierURL = URL(string: contentKeyIdentifierString),
-            var assetIDString = contentKeyIdentifierURL.host,
-            var assetIDData = assetIDString.data(using: .utf8)
-            else {
-                print("Failed to retrieve the assetID from the keyRequest!")
-                return
-        }
+//        guard let contentKeyIdentifierString = keyRequest.identifier as? String,
+//            let contentKeyIdentifierURL = URL(string: contentKeyIdentifierString),
+//            var assetIDString = contentKeyIdentifierURL.host,
+//            var assetIDData = assetIDString.data(using: .utf8)
+//            else {
+//                print("Failed to retrieve the assetID from the keyRequest!")
+//                return
+//        }
         
-        assetIDString = releasePid
-        assetIDData = assetIDString.data(using: .utf8)!
+        let assetIDString = releasePid
+        let assetIDData = assetIDString.data(using: .utf8)!
 
 
         let provideOnlinekey: () -> Void = { () -> Void in

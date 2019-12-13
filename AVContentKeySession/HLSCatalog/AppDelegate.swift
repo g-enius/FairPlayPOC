@@ -17,7 +17,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication,
                      didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
         // Restore the state of the application and any running downloads.
-//        AssetPersistenceManager.sharedManager.restorePersistenceManager()
+        AssetPersistenceManager.sharedManager.restorePersistenceManager()
         
         return true
     }

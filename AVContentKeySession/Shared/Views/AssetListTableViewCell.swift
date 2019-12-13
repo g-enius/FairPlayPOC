@@ -29,30 +29,30 @@ class AssetListTableViewCell: UITableViewCell {
     var asset: Asset? {
         didSet {
             if let asset = asset {
-//                #if os(iOS)
-//                    let downloadState = AssetPersistenceManager.sharedManager.downloadState(for: asset)
-//
-//                    switch downloadState {
-//                    case .downloaded:
-//                        downloadProgressView.isHidden = true
-//
-//                    case .downloading:
-//
-//                        downloadProgressView.isHidden = false
-//
-//                    case .notDownloaded:
-//                        break
-//                    }
-//
-//                    downloadStateLabel.text = downloadState.rawValue
-//
-//                    let notificationCenter = NotificationCenter.default
-//                    notificationCenter.addObserver(self,
-//                                                   selector: #selector(handleAssetDownloadStateChanged(_:)),
-//                                                   name: .AssetDownloadStateChanged, object: nil)
-//                    notificationCenter.addObserver(self, selector: #selector(handleAssetDownloadProgress(_:)),
-//                                                   name: .AssetDownloadProgress, object: nil)
-//                #endif
+                #if os(iOS)
+                    let downloadState = AssetPersistenceManager.sharedManager.downloadState(for: asset)
+
+                    switch downloadState {
+                    case .downloaded:
+                        downloadProgressView.isHidden = true
+
+                    case .downloading:
+
+                        downloadProgressView.isHidden = false
+
+                    case .notDownloaded:
+                        break
+                    }
+
+                    downloadStateLabel.text = downloadState.rawValue
+
+                    let notificationCenter = NotificationCenter.default
+                    notificationCenter.addObserver(self,
+                                                   selector: #selector(handleAssetDownloadStateChanged(_:)),
+                                                   name: .AssetDownloadStateChanged, object: nil)
+                    notificationCenter.addObserver(self, selector: #selector(handleAssetDownloadProgress(_:)),
+                                                   name: .AssetDownloadProgress, object: nil)
+                #endif
                 
                 assetNameLabel.text = asset.stream.name
             } else {

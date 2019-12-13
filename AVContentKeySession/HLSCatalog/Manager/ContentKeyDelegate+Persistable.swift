@@ -77,106 +77,101 @@ extension ContentKeyDelegate {
          The key ID is the URI from the EXT-X-KEY tag in the playlist (e.g. "skd://key65") and the
          asset ID in this case is "key65".
          */
-        guard let contentKeyIdentifierString = keyRequest.identifier as? String,
-            let contentKeyIdentifierURL = URL(string: contentKeyIdentifierString),
-            let assetIDString = contentKeyIdentifierURL.host,
-            let assetIDData = assetIDString.data(using: .utf8)
-            else {
-                print("Failed to retrieve the assetID from the keyRequest!")
+//        guard let contentKeyIdentifierString = keyRequest.identifier as? String,
+//            let contentKeyIdentifierURL = URL(string: contentKeyIdentifierString),
+//            let assetIDString = contentKeyIdentifierURL.host,
+//            let assetIDData = assetIDString.data(using: .utf8)
+//            else {
+//                print("Failed to retrieve the assetID from the keyRequest!")
+//                return
+//        }
+//
+        let assetIDString = releasePid
+        let assetIDData = assetIDString.data(using: .utf8)!
+        
+        // Check to see if we can satisfy this key request using a saved persistent key file.
+        if persistableContentKeyExistsOnDisk(withContentKeyIdentifier: assetIDString) {
+            
+            let urlToPersistableKey = urlForPersistableContentKey(withContentKeyIdentifier: assetIDString)
+            
+            guard let contentKey = FileManager.default.contents(atPath: urlToPersistableKey.path) else {
+                // Error Handling.
+                
+                pendingPersistableContentKeyIdentifiers.remove(assetIDString)
                 return
+            }
+            
+            /*
+             Create an AVContentKeyResponse from the persistent key data to use for requesting a key for
+             decrypting content.
+             */
+            let keyResponse = AVContentKeyResponse(fairPlayStreamingKeyResponseData: contentKey)
+            
+            // Provide the content key response to make protected content available for processing.
+            keyRequest.processContentKeyResponse(keyResponse)
+            
+            return
         }
         
-        do {
-            let completionHandler = { [weak self] (spcData: Data?, error: Error?) in
+        requestApplicationCertificate(completionHandler: { applicationCertificate in
+        
+            let innerCompletionHandler = { [weak self] (spcData: Data?, error: Error?) in
                 guard let strongSelf = self else { return }
                 if let error = error {
                     keyRequest.processContentKeyResponseError(error)
-                    
+                
                     strongSelf.pendingPersistableContentKeyIdentifiers.remove(assetIDString)
                     return
                 }
-                
+
                 guard let spcData = spcData else { return }
-                
-                // Send SPC to Key Server and obtain CKC
-                try strongSelf.requestContentKeyFromKeySecurityModule(spcData: spcData, assetID: assetIDString, completionHandler: { ckcData in
-                    do {
-                        let persistentKey = try keyRequest.persistableContentKey(fromKeyVendorResponse: ckcData!, options: nil)
-                        
-                        try strongSelf.writePersistableContentKey(contentKey: persistentKey, withContentKeyIdentifier: assetIDString)
-                        
-                        /*
-                         AVContentKeyResponse is used to represent the data returned from the key server when requesting a key for
-                         decrypting content.
-                         */
-                        let keyResponse = AVContentKeyResponse(fairPlayStreamingKeyResponseData: persistentKey)
-                        
-                        /*
-                         Provide the content key response to make protected content available for processing.
-                         */
-                        keyRequest.processContentKeyResponse(keyResponse)
-                        
-                        let assetName = strongSelf.contentKeyToStreamNameMap.removeValue(forKey: assetIDString)!
-                        
-                        if !strongSelf.contentKeyToStreamNameMap.values.contains(assetName) {
-                            NotificationCenter.default.post(name: .DidSaveAllPersistableContentKey,
-                                                            object: nil,
-                                                            userInfo: ["name": assetName])
-                        }
-                        
-                        strongSelf.pendingPersistableContentKeyIdentifiers.remove(assetIDString)
-                    } catch {
-                        keyRequest.processContentKeyResponseError(error)
+
+                do {
+                    // Send SPC to Key Server and obtain CKC
+                    try strongSelf.requestContentKeyFromKeySecurityModule(spcData: spcData, assetID: strongSelf.releasePid, completionHandler: { ckcData in
+                        do {
+                            let persistentKey = try keyRequest.persistableContentKey(fromKeyVendorResponse: ckcData!, options: nil)
+                            
+                            try strongSelf.writePersistableContentKey(contentKey: persistentKey, withContentKeyIdentifier: assetIDString)
+                            
+                            /*
+                             AVContentKeyResponse is used to represent the data returned from the key server when requesting a key for
+                             decrypting content.
+                             */
+                            let keyResponse = AVContentKeyResponse(fairPlayStreamingKeyResponseData: persistentKey)
+                            
+                            /*
+                             Provide the content key response to make protected content available for processing.
+                             */
+                            keyRequest.processContentKeyResponse(keyResponse)
+                            
+                            let assetName = strongSelf.contentKeyToStreamNameMap.removeValue(forKey: assetIDString)!
+                            
+                            if !strongSelf.contentKeyToStreamNameMap.values.contains(assetName) {
+                                NotificationCenter.default.post(name: .DidSaveAllPersistableContentKey,
+                                                                object: nil,
+                                                                userInfo: ["name" : assetName])
+                            }
+                            
+                            strongSelf.pendingPersistableContentKeyIdentifiers.remove(assetIDString)
+                        } catch {
+                            keyRequest.processContentKeyResponseError(error)
                                            
-                        strongSelf.pendingPersistableContentKeyIdentifiers.remove(assetIDString)
-                    }
-                })
-            }
-            
-            // Check to see if we can satisfy this key request using a saved persistent key file.
-            if persistableContentKeyExistsOnDisk(withContentKeyIdentifier: assetIDString) {
-                
-                let urlToPersistableKey = urlForPersistableContentKey(withContentKeyIdentifier: assetIDString)
-                
-                guard let contentKey = FileManager.default.contents(atPath: urlToPersistableKey.path) else {
-                    // Error Handling.
-                    
-                    pendingPersistableContentKeyIdentifiers.remove(assetIDString)
-                    
-                    /*
-                     Key requests should never be left dangling.
-                     Attempt to create a new persistable key.
-                     */
-                    requestApplicationCertificate(completionHandler: { applicationCertificate in
-                        keyRequest.makeStreamingContentKeyRequestData(forApp: applicationCertificate!,
-                                                                                         contentIdentifier: assetIDData,
-                                                                                         options: [AVContentKeyRequestProtocolVersionsKey: [1]],
-                                                                                         completionHandler: completionHandler as! (Data?, Error?) -> Void)
+                            strongSelf.pendingPersistableContentKeyIdentifiers.remove(assetIDString)
+                        }
                     })
-                    return
+                } catch {
+                    keyRequest.processContentKeyResponseError(error)
+                    
+                    strongSelf.pendingPersistableContentKeyIdentifiers.remove(assetIDString)
                 }
-                
-                /*
-                 Create an AVContentKeyResponse from the persistent key data to use for requesting a key for
-                 decrypting content.
-                 */
-                let keyResponse = AVContentKeyResponse(fairPlayStreamingKeyResponseData: contentKey)
-                
-                // Provide the content key response to make protected content available for processing.
-                keyRequest.processContentKeyResponse(keyResponse)
-                
-                return
             }
-            
-           requestApplicationCertificate(completionHandler: { applicationCertificate in
-                keyRequest.makeStreamingContentKeyRequestData(forApp: applicationCertificate!,
-                contentIdentifier: assetIDData,
-                options: [AVContentKeyRequestProtocolVersionsKey: [1]],
-                completionHandler: completionHandler as! (Data?, Error?) -> Void)
-            })
-        } catch {
-            print("Failure responding to an AVPersistableContentKeyRequest when attemping to determine if key is already available for use on disk.")
-        }
+        
+            keyRequest.makeStreamingContentKeyRequestData(forApp: applicationCertificate!,
+                                                          contentIdentifier: assetIDData,
+                                                          options: [AVContentKeyRequestProtocolVersionsKey: [1]],
+                                                          completionHandler: innerCompletionHandler)
+        })
     }
     
     /// Deletes all the persistable content keys on disk for a specific `Asset`.

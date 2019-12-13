@@ -22,7 +22,7 @@
 		<key>name</key>
 		<string>Add Entry for FPS Sample in Streams.plist</string>
 		<key>playlist_url</key>
-		<string>https://skysport3.akamaized.net/out/v1/734adeb531654568ae6ec081a2bcebc9/index.m3u8</string>
+		<string>https://skynativehls.akamaized.net/Sky_Master_Catalog_-_SIT/757/675/OT069204-1573448431392.m3u8</string>
 		<key>is_protected</key>
 		<true/>
 	</dict>
